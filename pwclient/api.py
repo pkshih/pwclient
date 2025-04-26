@@ -711,7 +711,7 @@ class REST(API):
             'hash': obj['hash'] or '',
         }
 
-    def patch_list(
+    def patch_list_core(
         self,
         project,
         submitter,
@@ -721,7 +721,8 @@ class REST(API):
         msgid,
         name,
         hash,
-        max_count=None,
+        max_count,#=None,
+        page,
     ):
         # we could implement these but we don't need them
         if max_count:
@@ -747,8 +748,51 @@ class REST(API):
         if archived is not None:
             filters['archived'] = archived
 
-        patches = self._list('patches', params=filters)
+        if page is not None:
+            filters['page'] = page
+
+        patches_tmp = self._list('patches', params=filters)
+        patches = []
+
+        if name:
+            for patch in patches_tmp:
+                if patch['name'].find(name) == -1:
+                    continue
+                patches.append(patch)
+        else:
+            patches = patches_tmp
+
         return [self._patch_to_dict(patch) for patch in patches]
+
+    def patch_list(
+        self,
+        project,
+        submitter,
+        delegate,
+        state,
+        archived,
+        msgid,
+        name,
+        hash,
+        max_count=None,
+    ):
+        whole_list = []
+
+        # adjust start page to proper one to save time
+        for page in range(9, 99):
+            # Since it takes a long time, add a prompt...
+            print(".", end='', flush=True)
+            try:
+                a_list = self.patch_list_core(project, submitter, delegate, state, archived, msgid, name, hash, max_count,
+                                          page)
+            except TypeError:
+                break
+
+            whole_list += a_list
+
+        print("")
+
+        return whole_list
 
     def patch_get(self, patch_id):
         patch = self._detail('patches', patch_id)
