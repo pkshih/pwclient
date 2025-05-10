@@ -68,6 +68,7 @@ def action_list(
     hash=None,
     max_count=None,
     format_str=None,
+    pages=None,
 ):
     # We exclude submitter and delegate since these are handled specially
     filters = {
@@ -80,6 +81,7 @@ def action_list(
         'max_count': max_count,
         'submitter': None,
         'delegate': None,
+        'pages' : pages,
     }
 
     # TODO(stephenfin): Remove these logs since they break our ability to

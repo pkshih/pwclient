@@ -148,6 +148,11 @@ def main(argv=sys.argv[1:]):
             sys.exit(1)
 
     if action == 'list' or action == 'search':
+        if args.pages is not None:
+          pages=args.pages
+        elif config.has_option(project_str, 'pages'):
+          pages=config.get(project_str, 'pages')
+
         patches.action_list(
             api,
             project=project_str,
@@ -160,6 +165,7 @@ def main(argv=sys.argv[1:]):
             hash=args.hash,
             max_count=args.max_count,
             format_str=args.format,
+            pages=pages,
         )
 
     elif action.startswith('project'):

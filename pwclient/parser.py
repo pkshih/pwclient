@@ -61,6 +61,12 @@ def _get_filter_parser():
         help="filter by patch archived state",
     )
     filter_parser.add_argument(
+        '-r',
+        '--pages',
+        metavar='PAGES',
+        help="set pages going to get for REST backend",
+    )
+    filter_parser.add_argument(
         '-p',
         '--project',
         metavar='PROJECT',
@@ -308,6 +314,12 @@ installed locales.
         '--archived',
         choices=['yes', 'no'],
         help="set patch archived state",
+    )
+    update_parser.add_argument(
+        '-r',
+        '--pages',
+        metavar='PAGES',
+        help="set pages going to get for REST backend",
     )
     update_parser.set_defaults(subcmd='update')
 

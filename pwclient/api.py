@@ -19,6 +19,11 @@ from . import xmlrpc
 from . import __version__
 from .xmlrpc import xmlrpclib
 
+def int_default(string, default):
+    try:
+      return int(string)
+    except:
+      return default
 
 class API(metaclass=abc.ABCMeta):
     @abc.abstractmethod
@@ -68,6 +73,7 @@ class API(metaclass=abc.ABCMeta):
         name,
         hash,
         max_count=None,
+        pages=None,
     ):
         pass
 
@@ -247,6 +253,7 @@ class XMLRPC(API):
         name,
         hash,
         max_count=None,
+        pages=None,
     ):
         filters = {}
 
@@ -775,11 +782,26 @@ class REST(API):
         name,
         hash,
         max_count=None,
+        pages=None,
     ):
         whole_list = []
 
+        page_s = 1
+        page_e = 1
+
+        # pages in format of string, such 9-10, 9-, 9
+        if pages is not None:
+          plist = pages.split("-", 2)
+          if plist[0] is not None:
+            page_s = int_default(plist[0], 1)
+            page_e = int_default(plist[0], 1)
+          if len(plist) >= 2:
+            page_e = int_default(plist[1], 9999)
+
+        print("list page from", page_s, "to", page_e, end='', flush=True)
+
         # adjust start page to proper one to save time
-        for page in range(9, 99):
+        for page in range(page_s, page_e + 1):
             # Since it takes a long time, add a prompt...
             print(".", end='', flush=True)
             try:
